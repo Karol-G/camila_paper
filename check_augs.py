@@ -8,7 +8,10 @@ import numpy as np
 filenames = utils.load_filenames("/home/k539i/Documents/datasets/original/COVID19-Challenge/Train/images")
 filenames = filenames[:1]
 
-transform = tio.Compose([tio.RandomAffine(scales=(0.5, 0.5), p=1)])
+# Set 1
+# Test 1: transform = tio.Compose([tio.RandomAffine(scales=(0.5, 1.0), p=1)])
+
+transform = tio.Compose([tio.RandomAffine(scales=(0.5, 1.0), p=1)])
 
 for filename in filenames:
     print(os.path.basename(filename))
