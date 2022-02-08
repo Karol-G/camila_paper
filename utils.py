@@ -6,6 +6,7 @@ import gc
 import os
 from natsort import natsorted
 from os.path import join
+import global_mp_pool
 
 
 def resample(image: np.ndarray, target_shape, is_seg=False) -> np.ndarray:
@@ -36,24 +37,22 @@ def standardize(img_npy: np.ndarray) -> np.ndarray:
     return img_npy
 
 
-def fix_path(path):
-    if path[-1] != "/":
-        path += "/"
-    return path
-
-
-def load_filenames(img_dir, extensions=None):
-    img_filenames = []
+def load_filepaths(load_dir, extensions=None, return_path=True, return_extension=True):
+    filepaths = []
     if extensions is not None:
         extensions = tuple(extensions)
 
-    for file in os.listdir(img_dir):
-        if extensions is None or file.endswith(extensions):
-            img_filenames.append(join(img_dir, file))
-    img_filenames = np.asarray(img_filenames)
-    img_filenames = natsorted(img_filenames)
+    for filename in os.listdir(load_dir):
+        if extensions is None or filename.endswith(extensions):
+            if not return_extension:
+                filename = filename.split(".")[0]
+            if return_path:
+                filename = join(load_dir, filename)
+            filepaths.append(filename)
+    filepaths = np.asarray(filepaths)
+    filepaths = natsorted(filepaths)
 
-    return img_filenames
+    return filepaths
 
 
 def load_nifti(filename, return_meta=False, is_seg=False):
@@ -62,7 +61,7 @@ def load_nifti(filename, return_meta=False, is_seg=False):
 
     if is_seg:
         image_np = np.rint(image_np)
-        image_np = image_np.astype(np.int32)  # In special cases segmentations can contain negative labels, so no np.uint8
+        # image_np = image_np.astype(np.int16)  # In special cases segmentations can contain negative labels, so no np.uint8
 
     if not return_meta:
         return image_np
@@ -74,10 +73,48 @@ def load_nifti(filename, return_meta=False, is_seg=False):
         return image_np, spacing, affine, header
 
 
-def save_nifti(filename, image, spacing=None, affine=None, header=None, is_seg=False, mp_pool=None, free_mem=False):
+# def save_nifti(filename, image, spacing=None, affine=None, header=None, is_seg=False, mp_pool=None, pool_results=None, free_mem=False, dtype=None):
+#     if is_seg:
+#         image = np.rint(image)
+#         if dtype is None:
+#             image = image.astype(np.int32)  # In special cases segmentations can contain negative labels, so no np.uint8
+#
+#     if dtype is not None:
+#         image = image.astype(dtype)
+#
+#     image = sitk.GetImageFromArray(image)
+#
+#     if header is not None:
+#         [image.SetMetaData(key, header[key]) for key in header.keys()]
+#
+#     if spacing is not None:
+#         # image.SetSpacing(list(spacing)[::-1])  # TODO: Keep the reversing of the spacing?
+#         image.SetSpacing(spacing)  # TODO: Reverse the spacing?
+#
+#     if affine is not None:
+#         pass  # How do I set the affine transform with SimpleITK? With NiBabel it is just nib.Nifti1Image(img, affine=affine, header=header)
+#
+#     if mp_pool is None:
+#         sitk.WriteImage(image, filename)
+#         if free_mem:
+#             del image
+#             gc.collect()
+#     else:
+#         # mp_pool.apply_async(_save, args=(filename, image, free_mem,))  # TODO: apply_async leads to a memory leak. DO NOT USE!
+#         pool_results.append(mp_pool.starmap_async(_save, ((filename, image, free_mem), )))
+#         if free_mem:
+#             del image
+#             gc.collect()
+
+
+def save_nifti(filename, image, spacing=None, affine=None, header=None, is_seg=False, dtype=None, in_background=False):
     if is_seg:
         image = np.rint(image)
-        image = image.astype(np.int32)  # In special cases segmentations can contain negative labels, so no np.uint8
+        if dtype is None:
+            image = image.astype(np.int16)  # In special cases segmentations can contain negative labels, so no np.uint8 by default
+
+    if dtype is not None:
+        image = image.astype(dtype)
 
     image = sitk.GetImageFromArray(image)
 
@@ -85,25 +122,17 @@ def save_nifti(filename, image, spacing=None, affine=None, header=None, is_seg=F
         [image.SetMetaData(key, header[key]) for key in header.keys()]
 
     if spacing is not None:
-        image.SetSpacing(list(spacing)[::-1])  # TODO: Keep the reversing of the spacing?
+        image.SetSpacing(spacing)
 
     if affine is not None:
         pass  # How do I set the affine transform with SimpleITK? With NiBabel it is just nib.Nifti1Image(img, affine=affine, header=header)
 
-    if mp_pool is None:
+    if not in_background:
         sitk.WriteImage(image, filename)
-        if free_mem:
-            del image
-            gc.collect()
     else:
-        mp_pool.apply_async(_save, args=(filename, image, free_mem,))
-        if free_mem:
-            del image
-            gc.collect()
+        global_pool, global_pool_results = global_mp_pool.get_pool()
+        global_pool_results.append(global_pool.starmap_async(_save, ((filename, image), )))
 
 
-def _save(filename, image, free_mem):
+def _save(filename, image):
     sitk.WriteImage(image, filename)
-    if free_mem:
-        del image
-        gc.collect()

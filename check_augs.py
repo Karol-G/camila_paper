@@ -6,7 +6,7 @@ import os
 import numpy as np
 import SimpleITK as sitk
 
-filenames = utils.load_filenames(r"D:\Datasets\camila_paper\COVID19-Challenge\Train\images")
+filenames = utils.load_filepaths(r"D:\Datasets\camila_paper\COVID19-Challenge\Train\images")
 filenames = filenames[:1]
 
 # Set 1
