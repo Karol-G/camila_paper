@@ -34,12 +34,3 @@ for filename in filenames:
     )
     subject = transform(subject)
     image = subject["image"].save(r"D:\Datasets\camila_paper\results\test.nii.gz")
-
-# image = np.transpose(image, (2, 0, 1))
-# image = np.rot90(image, k=-1, axes=(1, 2))
-# image = np.flip(image, axis=2)
-#
-# image = sitk.GetArrayFromImage(image)
-# viewer = Viewer()
-# viewer.add_image(image, rgb=False)
-# napari.run()
