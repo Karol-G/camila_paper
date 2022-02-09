@@ -47,7 +47,6 @@ def generate_dataset(load_image_dir, load_seg_dir, save_dir, task, transform_nam
             utils.save_nifti(join(seg_save_path, name + ".nii.gz"), subject["seg"].numpy()[0], spacing=spacing, is_seg=True, dtype=np.uint8, in_background=parallel)
 
     print("Still saving images in background...")
-    global_mp_pool.get_results()
     global_mp_pool.close_pool()
     print("Finished saving images.")
 

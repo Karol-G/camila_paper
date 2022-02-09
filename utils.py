@@ -97,8 +97,11 @@ def save_nifti(filename, image, spacing=None, affine=None, header=None, is_seg=F
         sitk.WriteImage(image, filename)
     else:
         global_pool, global_pool_results = global_mp_pool.get_pool()
-        global_pool_results.append(global_pool.starmap_async(_save, ((filename, image), )))
+        # global_pool_results.append(global_pool.starmap_async(_save, ((filename, image), )))
+        global_mp_pool.queue_job(global_pool.starmap_async, _save, ((filename, image), ))
 
 
 def _save(filename, image):
     sitk.WriteImage(image, filename)
+    os.remove(filename)
+    return None
