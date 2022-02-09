@@ -24,10 +24,6 @@ def generate_dataset(load_image_dir, load_seg_dir, save_dir, task, transform_nam
     names = utils.load_filepaths(load_image_dir, return_path=False, return_extension=False)
     names = [name[:-3] for name in names]
 
-    # TODO: REMOVE
-    names = names[:1] * 100
-    counter = 0
-
     transform = get_transform(transform_name)
 
     for name in tqdm(names):
@@ -46,10 +42,9 @@ def generate_dataset(load_image_dir, load_seg_dir, save_dir, task, transform_nam
 
         subject = transform(subject)
 
-        utils.save_nifti(join(image_save_path, name + str(counter) + "_0000.nii.gz"), subject["image"].numpy()[0], spacing=spacing, dtype=image.dtype, in_background=parallel)
+        utils.save_nifti(join(image_save_path, name + "_0000.nii.gz"), subject["image"].numpy()[0], spacing=spacing, dtype=image.dtype, in_background=parallel)
         if load_seg_dir is not None:
             utils.save_nifti(join(seg_save_path, name + ".nii.gz"), subject["seg"].numpy()[0], spacing=spacing, is_seg=True, dtype=np.uint8, in_background=parallel)
-        counter += 1
 
     print("Still saving images in background...")
     global_mp_pool.get_results()
