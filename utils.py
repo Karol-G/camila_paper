@@ -2,7 +2,6 @@ import numpy as np
 import SimpleITK as sitk
 import torch
 from torch.nn import functional
-import gc
 import os
 from natsort import natsorted
 from os.path import join
@@ -103,5 +102,3 @@ def save_nifti(filename, image, spacing=None, affine=None, header=None, is_seg=F
 
 def _save(filename, image):
     sitk.WriteImage(image, filename)
-    os.remove(filename)
-    return None
