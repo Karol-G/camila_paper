@@ -73,40 +73,6 @@ def load_nifti(filename, return_meta=False, is_seg=False):
         return image_np, spacing, affine, header
 
 
-# def save_nifti(filename, image, spacing=None, affine=None, header=None, is_seg=False, mp_pool=None, pool_results=None, free_mem=False, dtype=None):
-#     if is_seg:
-#         image = np.rint(image)
-#         if dtype is None:
-#             image = image.astype(np.int32)  # In special cases segmentations can contain negative labels, so no np.uint8
-#
-#     if dtype is not None:
-#         image = image.astype(dtype)
-#
-#     image = sitk.GetImageFromArray(image)
-#
-#     if header is not None:
-#         [image.SetMetaData(key, header[key]) for key in header.keys()]
-#
-#     if spacing is not None:
-#         # image.SetSpacing(list(spacing)[::-1])  # TODO: Keep the reversing of the spacing?
-#         image.SetSpacing(spacing)  # TODO: Reverse the spacing?
-#
-#     if affine is not None:
-#         pass  # How do I set the affine transform with SimpleITK? With NiBabel it is just nib.Nifti1Image(img, affine=affine, header=header)
-#
-#     if mp_pool is None:
-#         sitk.WriteImage(image, filename)
-#         if free_mem:
-#             del image
-#             gc.collect()
-#     else:
-#         # mp_pool.apply_async(_save, args=(filename, image, free_mem,))  # TODO: apply_async leads to a memory leak. DO NOT USE!
-#         pool_results.append(mp_pool.starmap_async(_save, ((filename, image, free_mem), )))
-#         if free_mem:
-#             del image
-#             gc.collect()
-
-
 def save_nifti(filename, image, spacing=None, affine=None, header=None, is_seg=False, dtype=None, in_background=False):
     if is_seg:
         image = np.rint(image)
