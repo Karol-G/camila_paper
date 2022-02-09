@@ -24,6 +24,10 @@ def generate_dataset(load_image_dir, load_seg_dir, save_dir, task, transform_nam
     names = utils.load_filepaths(load_image_dir, return_path=False, return_extension=False)
     names = [name[:-3] for name in names]
 
+    # TODO: REMOVE
+    names = names[:1] * 100
+    counter = 0
+
     transform = get_transform(transform_name)
 
     for name in tqdm(names):
@@ -42,9 +46,10 @@ def generate_dataset(load_image_dir, load_seg_dir, save_dir, task, transform_nam
 
         subject = transform(subject)
 
-        utils.save_nifti(join(image_save_path, name + "_0000.nii.gz"), subject["image"].numpy()[0], spacing=spacing, dtype=image.dtype, in_background=parallel)
+        utils.save_nifti(join(image_save_path, name + str(counter) + "_0000.nii.gz"), subject["image"].numpy()[0], spacing=spacing, dtype=image.dtype, in_background=parallel)
         if load_seg_dir is not None:
             utils.save_nifti(join(seg_save_path, name + ".nii.gz"), subject["seg"].numpy()[0], spacing=spacing, is_seg=True, dtype=np.uint8, in_background=parallel)
+        counter += 1
 
     print("Still saving images in background...")
     global_mp_pool.get_results()
@@ -55,8 +60,12 @@ def generate_dataset(load_image_dir, load_seg_dir, save_dir, task, transform_nam
 
 
 def get_transform(transform_name):
-    transform_type, transform_difficulty = transform_name.split("_")
-    transform = transform_dict.transforms[transform_type][transform_difficulty]
+    transform_type, transform_difficulty, determinism = transform_name.split("_")
+    if determinism == "i":
+        determinism = "identical"
+    else:
+        determinism = "random"
+    transform = transform_dict.transforms[transform_type][transform_difficulty][determinism]
     return transform
 
 
@@ -66,14 +75,14 @@ if __name__ == '__main__':
     # Example: python generate_dataset.py -i /home/k539i/Documents/datasets/original/COVID19-Challenge/Train/images
     #                                     -s /home/k539i/Documents/datasets/original/COVID19-Challenge/Train/masks
     #                                     -o /home/k539i/Documents/datasets/original/COVID19-Challenge/nnunet_datasets
-    #                                     -t Task200_COVID19 --transform affine_easy -p 4
+    #                                     -t Task200_COVID19 --transform affine_easy_r -p 4
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', "--img", required=True, help="Absolute path to the folder with the input images.")
     parser.add_argument('-s', "--seg", required=False, default=None, help="(Optional) Absolute path to the folder with the input segmentation masks.")
     parser.add_argument('-o', "--output", required=True, help="Absolute output path to the folder that should be used for saving")
     parser.add_argument('-t', "--task", required=True, help="The full task name (e.g. Task200_COVID19)")
-    parser.add_argument("--transform", required=True, help="The transform name inf the format TYPE_DIFFICULTY (e.g. affine_easy)")
+    parser.add_argument("--transform", required=True, help="The transform name inf the format TYPE_DIFFICULTY_DETERMINISM (e.g. affine_easy_r, artifacts_strong_i)")
     parser.add_argument('-p', '--parallel', required=False, default=0, type=int, help="Number of threads to use for parallel processing. 0 to disable multiprocessing.")
     args = parser.parse_args()
 
