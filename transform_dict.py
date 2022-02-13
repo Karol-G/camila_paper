@@ -3,72 +3,136 @@ from collections import defaultdict
 
 transforms = defaultdict(lambda: defaultdict(dict))
 
-transforms["affine"]["weak"]["random"] = tio.Compose([tio.RandomAffine(scales=(0.8, 1.5), degrees=15, translation=15, isotropic=True, p=1)])
-transforms["affine"]["medium"]["random"] = tio.Compose([tio.RandomAffine(scales=(0.5, 2.5), degrees=30, translation=30, isotropic=True, p=1)])
-transforms["affine"]["strong"]["random"] = tio.Compose([tio.RandomAffine(scales=(0.5, 2.5), degrees=30, translation=30, isotropic=False, p=1)])
+weak_scales = (0.8, 1.5)
+weak_degrees = 15
+weak_translation = 15
+weak_isotropic = True
+transforms["affine"]["weak"]["random"] = tio.Compose([tio.RandomAffine(scales=weak_scales, degrees=weak_degrees, translation=weak_translation, isotropic=weak_isotropic, p=1)])
 
-transforms["affine"]["weak"]["identical"] = tio.Compose([tio.OneOf([tio.RandomAffine(scales=(0.8, 0.8), degrees=(15, 15), translation=(15, 15), isotropic=True, p=1),
-                                                                    tio.RandomAffine(scales=(0.8, 0.8), degrees=(-15, -15), translation=(15, 15), isotropic=True, p=1),
-                                                                    tio.RandomAffine(scales=(0.8, 0.8), degrees=(15, 15), translation=(-15, -15), isotropic=True, p=1),
-                                                                    tio.RandomAffine(scales=(0.8, 0.8), degrees=(-15, -15), translation=(-15, -15), isotropic=True, p=1),
-                                                                    tio.RandomAffine(scales=(1.5, 1.5), degrees=(15, 15), translation=(15, 15), isotropic=True, p=1),
-                                                                    tio.RandomAffine(scales=(1.5, 1.5), degrees=(-15, -15), translation=(15, 15), isotropic=True, p=1),
-                                                                    tio.RandomAffine(scales=(1.5, 1.5), degrees=(15, 15), translation=(-15, -15), isotropic=True, p=1),
-                                                                    tio.RandomAffine(scales=(1.5, 1.5), degrees=(-15, -15), translation=(-15, -15), isotropic=True, p=1)
+medium_scales = (0.5, 2.5)
+medium_degrees = 30
+medium_translation = 30
+medium_isotropic = True
+transforms["affine"]["medium"]["random"] = tio.Compose([tio.RandomAffine(scales=medium_scales, degrees=medium_degrees, translation=medium_translation, isotropic=medium_isotropic, p=1)])
+
+strong_scales = (0.5, 2.5)
+strong_degrees = 30
+strong_translation = 30
+strong_isotropic = False
+transforms["affine"]["strong"]["random"] = tio.Compose([tio.RandomAffine(scales=strong_scales, degrees=strong_degrees, translation=strong_translation, isotropic=strong_isotropic, p=1)])
+
+transforms["affine"]["weak"]["identical"] = tio.Compose([tio.OneOf([tio.RandomAffine(scales=(weak_scales[0], weak_scales[0]), degrees=(weak_degrees, weak_degrees),
+                                                                                     translation=(weak_translation, weak_translation), isotropic=weak_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(weak_scales[0], weak_scales[0]), degrees=(-weak_degrees, -weak_degrees),
+                                                                                     translation=(weak_translation, weak_translation), isotropic=weak_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(weak_scales[0], weak_scales[0]), degrees=(weak_degrees, weak_degrees),
+                                                                                     translation=(-weak_translation, -weak_translation), isotropic=weak_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(weak_scales[0], weak_scales[0]), degrees=(-weak_degrees, -weak_degrees),
+                                                                                     translation=(-weak_translation, -weak_translation), isotropic=weak_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(weak_scales[1], weak_scales[1]), degrees=(weak_degrees, weak_degrees),
+                                                                                     translation=(weak_translation, weak_translation), isotropic=weak_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(weak_scales[1], weak_scales[1]), degrees=(-weak_degrees, -weak_degrees),
+                                                                                     translation=(weak_translation, weak_translation), isotropic=weak_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(weak_scales[1], weak_scales[1]), degrees=(weak_degrees, weak_degrees),
+                                                                                     translation=(-weak_translation, -weak_translation), isotropic=weak_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(weak_scales[1], weak_scales[1]), degrees=(-weak_degrees, -weak_degrees),
+                                                                                     translation=(-weak_translation, -weak_translation), isotropic=weak_isotropic, p=1)
                                                                     ])])
-transforms["affine"]["medium"]["identical"] = tio.Compose([tio.OneOf([tio.RandomAffine(scales=(0.5, 0.5), degrees=(30, 30), translation=(30, 30), isotropic=True, p=1),
-                                                                    tio.RandomAffine(scales=(0.5, 0.5), degrees=(-30, -30), translation=(30, 30), isotropic=True, p=1),
-                                                                    tio.RandomAffine(scales=(0.5, 0.5), degrees=(30, 30), translation=(-30, -30), isotropic=True, p=1),
-                                                                    tio.RandomAffine(scales=(0.5, 0.5), degrees=(-30, -30), translation=(-30, -30), isotropic=True, p=1),
-                                                                    tio.RandomAffine(scales=(2.5, 2.5), degrees=(30, 30), translation=(30, 30), isotropic=True, p=1),
-                                                                    tio.RandomAffine(scales=(2.5, 2.5), degrees=(-30, -30), translation=(30, 30), isotropic=True, p=1),
-                                                                    tio.RandomAffine(scales=(2.5, 2.5), degrees=(30, 30), translation=(-30, -30), isotropic=True, p=1),
-                                                                    tio.RandomAffine(scales=(2.5, 2.5), degrees=(-30, -30), translation=(-30, -30), isotropic=True, p=1)
+transforms["affine"]["medium"]["identical"] = tio.Compose([tio.OneOf([tio.RandomAffine(scales=(medium_scales[0], medium_scales[0]), degrees=(medium_degrees, medium_degrees),
+                                                                                     translation=(medium_translation, medium_translation), isotropic=medium_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(medium_scales[0], medium_scales[0]), degrees=(-medium_degrees, -medium_degrees),
+                                                                                     translation=(medium_translation, medium_translation), isotropic=medium_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(medium_scales[0], medium_scales[0]), degrees=(medium_degrees, medium_degrees),
+                                                                                     translation=(-medium_translation, -medium_translation), isotropic=medium_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(medium_scales[0], medium_scales[0]), degrees=(-medium_degrees, -medium_degrees),
+                                                                                     translation=(-medium_translation, -medium_translation), isotropic=medium_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(medium_scales[1], medium_scales[1]), degrees=(medium_degrees, medium_degrees),
+                                                                                     translation=(medium_translation, medium_translation), isotropic=medium_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(medium_scales[1], medium_scales[1]), degrees=(-medium_degrees, -medium_degrees),
+                                                                                     translation=(medium_translation, medium_translation), isotropic=medium_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(medium_scales[1], medium_scales[1]), degrees=(medium_degrees, medium_degrees),
+                                                                                     translation=(-medium_translation, -medium_translation), isotropic=medium_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(medium_scales[1], medium_scales[1]), degrees=(-medium_degrees, -medium_degrees),
+                                                                                     translation=(-medium_translation, -medium_translation), isotropic=medium_isotropic, p=1)
                                                                     ])])
-transforms["affine"]["strong"]["identical"] = tio.Compose([tio.OneOf([tio.RandomAffine(scales=(0.5, 0.5), degrees=(30, 30), translation=(30, 30), isotropic=False, p=1),
-                                                                    tio.RandomAffine(scales=(0.5, 0.5), degrees=(-30, -30), translation=(30, 30), isotropic=False, p=1),
-                                                                    tio.RandomAffine(scales=(0.5, 0.5), degrees=(30, 30), translation=(-30, -30), isotropic=False, p=1),
-                                                                    tio.RandomAffine(scales=(0.5, 0.5), degrees=(-30, -30), translation=(-30, -30), isotropic=False, p=1),
-                                                                    tio.RandomAffine(scales=(2.5, 2.5), degrees=(30, 30), translation=(30, 30), isotropic=False, p=1),
-                                                                    tio.RandomAffine(scales=(2.5, 2.5), degrees=(-30, -30), translation=(30, 30), isotropic=False, p=1),
-                                                                    tio.RandomAffine(scales=(2.5, 2.5), degrees=(30, 30), translation=(-30, -30), isotropic=False, p=1),
-                                                                    tio.RandomAffine(scales=(2.5, 2.5), degrees=(-30, -30), translation=(-30, -30), isotropic=False, p=1)
+transforms["affine"]["strong"]["identical"] = tio.Compose([tio.OneOf([tio.RandomAffine(scales=(strong_scales[0], strong_scales[0]), degrees=(strong_degrees, strong_degrees),
+                                                                                     translation=(strong_translation, strong_translation), isotropic=strong_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(strong_scales[0], strong_scales[0]), degrees=(-strong_degrees, -strong_degrees),
+                                                                                     translation=(strong_translation, strong_translation), isotropic=strong_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(strong_scales[0], strong_scales[0]), degrees=(strong_degrees, strong_degrees),
+                                                                                     translation=(-strong_translation, -strong_translation), isotropic=strong_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(strong_scales[0], strong_scales[0]), degrees=(-strong_degrees, -strong_degrees),
+                                                                                     translation=(-strong_translation, -strong_translation), isotropic=strong_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(strong_scales[1], strong_scales[1]), degrees=(strong_degrees, strong_degrees),
+                                                                                     translation=(strong_translation, strong_translation), isotropic=strong_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(strong_scales[1], strong_scales[1]), degrees=(-strong_degrees, -strong_degrees),
+                                                                                     translation=(strong_translation, strong_translation), isotropic=strong_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(strong_scales[1], strong_scales[1]), degrees=(strong_degrees, strong_degrees),
+                                                                                     translation=(-strong_translation, -strong_translation), isotropic=strong_isotropic, p=1),
+                                                                    tio.RandomAffine(scales=(strong_scales[1], strong_scales[1]), degrees=(-strong_degrees, -strong_degrees),
+                                                                                     translation=(-strong_translation, -strong_translation), isotropic=strong_isotropic, p=1)
                                                                     ])])
 
-transforms["intensity"]["weak"]["random"] = tio.Compose([tio.RescaleIntensity(out_min_max=(-3000, 2000))])
-transforms["intensity"]["medium"]["random"] = tio.Compose([tio.RescaleIntensity(out_min_max=(-4000, 3000))])
-transforms["intensity"]["strong"]["random"] = tio.Compose([tio.RescaleIntensity(out_min_max=(-5000, 5000))])
+weak_intensity = (-3000, 2000)
+transforms["intensity"]["weak"]["random"] = tio.Compose([tio.RescaleIntensity(out_min_max=weak_intensity)])
+medium_intensity = (-4000, 3000)
+transforms["intensity"]["medium"]["random"] = tio.Compose([tio.RescaleIntensity(out_min_max=medium_intensity)])
+strong_intensity = (-5000, 5000)
+transforms["intensity"]["strong"]["random"] = tio.Compose([tio.RescaleIntensity(out_min_max=strong_intensity)])
 
-transforms["intensity"]["weak"]["identical"] = tio.Compose([tio.RescaleIntensity(out_min_max=(-3000, 2000))])
-transforms["intensity"]["medium"]["identical"] = tio.Compose([tio.RescaleIntensity(out_min_max=(-4000, 3000))])
-transforms["intensity"]["strong"]["identical"] = tio.Compose([tio.RescaleIntensity(out_min_max=(-5000, 5000))])
+transforms["intensity"]["weak"]["identical"] = tio.Compose([tio.RescaleIntensity(out_min_max=weak_intensity)])
+transforms["intensity"]["medium"]["identical"] = tio.Compose([tio.RescaleIntensity(out_min_max=medium_intensity)])
+transforms["intensity"]["strong"]["identical"] = tio.Compose([tio.RescaleIntensity(out_min_max=strong_intensity)])
 
-transforms["artifacts"]["weak"]["random"] = tio.Compose([tio.RandomGhosting(num_ghosts=(1, 1), axes=(0,1,2), intensity=(0.0, 0.3), p=1),
-                                                            tio.RandomSpike(num_spikes=(1, 1), intensity=(0.0, 0.5), p=1),
-                                                            tio.RandomBlur(std=(0.0, 0.5), p=1),
-                                                            tio.RandomNoise(mean=0, std=(0, 25), p=1)])
+weak_num_ghosts = (1, 1)
+weak_ghost_intensity = (0.0, 0.3)
+weak_num_spikes = (1, 1)
+weak_spike_intensity = (0.0, 0.5)
+weak_blur = (0.0, 0.5)
+weak_noise = (0, 25)
+transforms["artifacts"]["weak"]["random"] = tio.Compose([tio.RandomGhosting(num_ghosts=weak_num_ghosts, axes=(0,1,2), intensity=weak_ghost_intensity, p=1),
+                                                            tio.RandomSpike(num_spikes=weak_num_spikes, intensity=weak_spike_intensity, p=1),
+                                                            tio.RandomBlur(std=weak_blur, p=1),
+                                                            tio.RandomNoise(mean=0, std=weak_noise, p=1)])
 
-transforms["artifacts"]["medium"]["random"] = tio.Compose([tio.RandomGhosting(num_ghosts=(2, 2), axes=(0,1,2), intensity=(0.0, 0.4), p=1),
-                                                            tio.RandomSpike(num_spikes=(1, 1), intensity=(0.0, 0.8), p=1),
-                                                            tio.RandomBlur(std=(0.0, 0.9), p=1),
-                                                            tio.RandomNoise(mean=0, std=(0, 50), p=1)])
+medium_num_ghosts = (2, 2)
+medium_ghost_intensity = (0.0, 0.4)
+medium_num_spikes = (1, 1)
+medium_spike_intensity = (0.0, 0.8)
+medium_blur = (0.0, 0.9)
+medium_noise = (0, 50)
+transforms["artifacts"]["medium"]["random"] = tio.Compose([tio.RandomGhosting(num_ghosts=medium_num_ghosts, axes=(0,1,2), intensity=medium_ghost_intensity, p=1),
+                                                            tio.RandomSpike(num_spikes=medium_num_spikes, intensity=medium_spike_intensity, p=1),
+                                                            tio.RandomBlur(std=medium_blur, p=1),
+                                                            tio.RandomNoise(mean=0, std=medium_noise, p=1)])
 
-transforms["artifacts"]["strong"]["random"] = tio.Compose([tio.RandomGhosting(num_ghosts=(3, 3), axes=(0,1,2), intensity=(0.0, 0.7), p=1),
-                                                            tio.RandomSpike(num_spikes=(1, 1), intensity=(0, 1.2), p=1),
-                                                            tio.RandomBlur(std=(0, 1.3), p=1),
-                                                            tio.RandomNoise(mean=0, std=(0, 75), p=1)])
+strong_num_ghosts = (3, 3)
+strong_ghost_intensity = (0.0, 0.7)
+strong_num_spikes = (1, 1)
+strong_spike_intensity = (0, 1.2)
+strong_blur = (0, 1.3)
+strong_noise = (0, 75)
+transforms["artifacts"]["strong"]["random"] = tio.Compose([tio.RandomGhosting(num_ghosts=strong_num_ghosts, axes=(0,1,2), intensity=strong_ghost_intensity, p=1),
+                                                            tio.RandomSpike(num_spikes=strong_num_spikes, intensity=strong_spike_intensity, p=1),
+                                                            tio.RandomBlur(std=strong_blur, p=1),
+                                                            tio.RandomNoise(mean=0, std=strong_noise, p=1)])
 
-transforms["artifacts"]["weak"]["identical"] = tio.Compose([tio.RandomGhosting(num_ghosts=(1, 1), axes=(0,1,2), intensity=(0.3, 0.3), p=1),
-                                                            tio.RandomSpike(num_spikes=(1, 1), intensity=(0.5, 0.5), p=1),
-                                                            tio.RandomBlur(std=(0.5, 0.5), p=1),
-                                                            tio.RandomNoise(mean=0, std=(25, 25), p=1)])
 
-transforms["artifacts"]["medium"]["identical"] = tio.Compose([tio.RandomGhosting(num_ghosts=(2, 2), axes=(0,1,2), intensity=(0.4, 0.4), p=1),
-                                                            tio.RandomSpike(num_spikes=(1, 1), intensity=(0.8, 0.8), p=1),
-                                                            tio.RandomBlur(std=(0.9, 0.9), p=1),
-                                                            tio.RandomNoise(mean=0, std=(50, 50), p=1)])
+transforms["artifacts"]["weak"]["identical"] = tio.Compose([tio.RandomGhosting(num_ghosts=(weak_num_ghosts[1], weak_num_ghosts[1]), axes=(0,1,2),
+                                                                               intensity=(weak_ghost_intensity[1], weak_ghost_intensity[1]), p=1),
+                                                            tio.RandomSpike(num_spikes=(weak_num_spikes[1], weak_num_spikes[1]), intensity=(weak_spike_intensity[1], weak_spike_intensity[1]), p=1),
+                                                            tio.RandomBlur(std=(weak_blur[1], weak_blur[1]), p=1),
+                                                            tio.RandomNoise(mean=0, std=(weak_noise[1], weak_noise[1]), p=1)])
 
-transforms["artifacts"]["strong"]["identical"] = tio.Compose([tio.RandomGhosting(num_ghosts=(3, 3), axes=(0,1,2), intensity=(0.7, 0.7), p=1),
-                                                            tio.RandomSpike(num_spikes=(1, 1), intensity=(1.2, 1.2), p=1),
-                                                            tio.RandomBlur(std=(1.3, 1.3), p=1),
-                                                            tio.RandomNoise(mean=0, std=(75, 75), p=1)])
+transforms["artifacts"]["medium"]["identical"] = tio.Compose([tio.RandomGhosting(num_ghosts=(medium_num_ghosts[1], medium_num_ghosts[1]), axes=(0,1,2),
+                                                                               intensity=(medium_ghost_intensity[1], medium_ghost_intensity[1]), p=1),
+                                                            tio.RandomSpike(num_spikes=(medium_num_spikes[1], medium_num_spikes[1]), intensity=(medium_spike_intensity[1], medium_spike_intensity[1]), p=1),
+                                                            tio.RandomBlur(std=(medium_blur[1], medium_blur[1]), p=1),
+                                                            tio.RandomNoise(mean=0, std=(medium_noise[1], medium_noise[1]), p=1)])
+
+transforms["artifacts"]["strong"]["identical"] = tio.Compose([tio.RandomGhosting(num_ghosts=(strong_num_ghosts[1], strong_num_ghosts[1]), axes=(0,1,2),
+                                                                               intensity=(strong_ghost_intensity[1], strong_ghost_intensity[1]), p=1),
+                                                            tio.RandomSpike(num_spikes=(strong_num_spikes[1], strong_num_spikes[1]), intensity=(strong_spike_intensity[1], strong_spike_intensity[1]), p=1),
+                                                            tio.RandomBlur(std=(strong_blur[1], strong_blur[1]), p=1),
+                                                            tio.RandomNoise(mean=0, std=(strong_noise[1], strong_noise[1]), p=1)])
+
