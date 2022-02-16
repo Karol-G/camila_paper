@@ -76,7 +76,7 @@ if __name__ == '__main__':
     parser.add_argument('-s', "--seg", required=False, default=None, help="(Optional) Absolute path to the folder with the input segmentation masks.")
     parser.add_argument('-o', "--output", required=True, help="Absolute output path to the folder that should be used for saving")
     parser.add_argument('-t', "--task", required=True, help="The full task name (e.g. Task200_COVID19)")
-    parser.add_argument("--transform", required=True, help="The transform name inf the format TYPE_DIFFICULTY_DETERMINISM (e.g. affine_easy_r, artifacts_strong_i)")
+    parser.add_argument("--transform", required=True, help="The transform name inf the format TYPE_DIFFICULTY_DETERMINISM (e.g. affine_weak_r, artifacts_strong_i)")
     parser.add_argument('-p', '--parallel', required=False, default=0, type=int, help="Number of threads to use for parallel processing. 0 to disable multiprocessing.")
     args = parser.parse_args()
 
