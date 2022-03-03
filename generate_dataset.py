@@ -8,6 +8,7 @@ from pathlib import Path
 import global_mp_pool
 from nnunet.dataset_conversion.utils import generate_dataset_json
 import transform_dict
+from functools import partial
 
 
 def generate_dataset(load_image_dir, load_seg_dir, save_dir, task, transform_name, parallel):
@@ -26,31 +27,39 @@ def generate_dataset(load_image_dir, load_seg_dir, save_dir, task, transform_nam
 
     transform = get_transform(transform_name)
 
-    for name in tqdm(names):
-        if load_seg_dir is not None:
-            image, spacing, affine, header = utils.load_nifti(join(load_image_dir, name + "_ct.nii.gz"), return_meta=True)
-            seg = utils.load_nifti(join(load_seg_dir, name + "_seg.nii.gz"), return_meta=False, is_seg=True)
-            subject = tio.Subject(
-                image=tio.ScalarImage(tensor=image[np.newaxis, ...]),
-                seg=tio.LabelMap(tensor=seg[np.newaxis, ...])
-            )
-        else:
-            image, spacing, affine, header = utils.load_nifti(join(load_image_dir, name + "_ct.nii.gz"), return_meta=True)
-            subject = tio.Subject(
-                image=tio.ScalarImage(tensor=image[np.newaxis, ...])
-            )
-
-        subject = transform(subject)
-
-        utils.save_nifti(join(image_save_path, name + "_0000.nii.gz"), subject["image"].numpy()[0], spacing=spacing, dtype=image.dtype, in_background=parallel)
-        if load_seg_dir is not None:
-            utils.save_nifti(join(seg_save_path, name + ".nii.gz"), subject["seg"].numpy()[0], spacing=spacing, is_seg=True, dtype=np.uint8, in_background=parallel)
+    if parallel == 0:
+        for name in tqdm(names):
+            process_case(name, transform, image_save_path, seg_save_path)
+    else:
+        pool, _ = global_mp_pool.get_pool()
+        pool.map(partial(process_case, transform=transform, image_save_path=image_save_path, seg_save_path=seg_save_path), names)
 
     print("Still saving images in background...")
     global_mp_pool.close_pool()
     print("Finished saving images.")
 
     generate_dataset_json(join(save_dir, 'dataset.json'), join(save_dir, "imagesTr"), None, ("CT",), {0: 'Background', 1: 'GGO'}, task)
+
+
+def process_case(name, transform, image_save_path, seg_save_path):
+    if load_seg_dir is not None:
+        image, spacing, affine, header = utils.load_nifti(join(load_image_dir, name + "_ct.nii.gz"), return_meta=True)
+        seg = utils.load_nifti(join(load_seg_dir, name + "_seg.nii.gz"), return_meta=False, is_seg=True)
+        subject = tio.Subject(
+            image=tio.ScalarImage(tensor=image[np.newaxis, ...]),
+            seg=tio.LabelMap(tensor=seg[np.newaxis, ...])
+        )
+    else:
+        image, spacing, affine, header = utils.load_nifti(join(load_image_dir, name + "_ct.nii.gz"), return_meta=True)
+        subject = tio.Subject(
+            image=tio.ScalarImage(tensor=image[np.newaxis, ...])
+        )
+
+    subject = transform(subject)
+
+    utils.save_nifti(join(image_save_path, name + "_0000.nii.gz"), subject["image"].numpy()[0], spacing=spacing, dtype=image.dtype)
+    if load_seg_dir is not None:
+        utils.save_nifti(join(seg_save_path, name + ".nii.gz"), subject["seg"].numpy()[0], spacing=spacing, is_seg=True, dtype=np.uint8)
 
 
 def get_transform(transform_name):
